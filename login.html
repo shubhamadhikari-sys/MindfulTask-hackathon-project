@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login — MindfulTask</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  
+  <style>
+    /* --- PAGE SPECIFIC OVERRIDES --- */
+    .split-screen {
+      flex-direction: row-reverse; 
+      min-height: 100vh;
+      display: flex;
+    }
+    .auth-side { flex: 1; padding: 40px 60px; display: flex; flex-direction: column; justify-content: center; background: #fff; }
+    
+    /* Visual Side - Green Theme */
+    .visual-side {
+      flex: 1.2;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      position: relative;
+      display: flex;
+      align-items: flex-end; 
+      justify-content: flex-start;
+      padding: 60px;
+    }
+    .visual-side::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background: url("data:image/svg+xml,%3Csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,100 Q400,300 800,100 T1600,100' fill='none' stroke='rgba(255,255,255,0.15)' stroke-width='2'/%3E%3Cpath d='M0,200 Q400,400 800,200 T1600,200' fill='none' stroke='rgba(255,255,255,0.1)' stroke-width='2'/%3E%3C/svg%3E");
+      background-size: cover; pointer-events: none;
+    }
+
+    /* Typography */
+    .quote-box { background: transparent; border: none; padding: 0; max-width: 500px; }
+    .quote-label {
+      font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+      color: rgba(255,255,255,0.8); margin-bottom: 20px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .quote-label::before { content:''; width: 40px; height: 1px; background: rgba(255,255,255,0.6); }
+    .quote-text {
+      font-family: 'Plus Jakarta Sans', sans-serif; font-size: 48px;
+      line-height: 1.1; font-weight: 700; margin-bottom: 20px; color: #fff;
+    }
+    .quote-author { font-size: 15px; opacity: 0.9; font-weight: 500; color: #E8F5E9; }
+
+    /* Form Styling */
+    .auth-btn { background: var(--primary); color: #fff; box-shadow: 0 4px 14px rgba(45, 106, 79, 0.25); }
+    .auth-btn:hover { background: #1B4332; transform: translateY(-1px); }
+    .auth-input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(45, 106, 79, 0.1); }
+    .checkbox-accent { accent-color: var(--primary); }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .split-screen { flex-direction: column; }
+      .visual-side { display: none; }
+      .auth-side { padding: 40px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="split-screen">
+    
+    <div class="visual-side">
+      <div class="quote-box">
+        <div class="quote-label">Wellness First</div>
+        <div class="quote-text">Focus Better.<br>Feel Better.</div>
+        <div class="quote-author">"Productivity isn't about doing more, it's about doing what matters while keeping your mind clear."</div>
+      </div>
+    </div>
+
+    <div class="auth-side">
+      <div style="max-width: 400px; width: 100%; margin: 0 auto;">
+        
+        <a href="index.html" style="text-decoration:none; text-align: left; margin-bottom: 40px; display: flex; align-items: center; gap: 8px;">
+          <svg style="width:24px; color: var(--primary);" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2L2 7l10 5 10-5-10-5zm0 9l2.5-1.25L12 8.5l-2.5 1.25L12 11zm0 2.5l-5-2.5-5 2.5L12 22l10-8.5-5-2.5-5 2.5z"/></svg>
+          <span style="font-weight: 800; font-size: 18px; color: var(--primary);">MindfulTask</span>
+        </a>
+
+        <div class="auth-header" style="text-align: left;">
+          <h1 style="font-size: 32px; font-weight: 700; color: var(--text-main);">Welcome Back</h1>
+          <p style="font-size: 14px; margin-top: 8px; color: var(--text-muted);">Enter your details to access your wellness space.</p>
+        </div>
+
+        <form id="loginForm" class="auth-form" novalidate>
+          <div style="margin-bottom: 16px;">
+            <label style="font-size: 13px; font-weight: 600; color: var(--text-main); margin-bottom: 6px; display: block;">Email</label>
+            <input id="email" type="email" class="auth-input" placeholder="name@email.com" required 
+                   style="padding-left: 16px; background: #F9FAFB; border: 1px solid #E5E7EB;" /> 
+          </div>
+
+          <div style="margin-bottom: 16px;">
+             <label style="font-size: 13px; font-weight: 600; color: var(--text-main); margin-bottom: 6px; display: block;">Password</label>
+             <div class="input-wrapper password-wrapper">
+              <input id="password" type="password" class="auth-input" placeholder="Enter your password" required 
+                     style="padding-left: 16px; background: #F9FAFB; border: 1px solid #E5E7EB;" />
+              <button type="button" id="togglePw" class="toggle-pw" style="opacity: 0.5;">👁️</button>
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; margin-top:10px; font-size:13px; align-items: center;">
+             <label style="display:flex; align-items:center; gap:8px; cursor:pointer; color:var(--text-muted);">
+               <input type="checkbox" class="checkbox-accent"> Remember me
+             </label>
+             <a href="#" style="color:var(--primary); font-weight:600; font-size: 12px;">Forgot Password</a>
+          </div>
+
+          <button id="submitBtn" class="auth-btn" type="submit" style="margin-top: 24px;">Sign In</button>
+        </form>
+
+        <div style="margin: 24px 0;">
+            <button class="btn-google" type="button" onclick="alert('Hackathon Demo: Please use Email/Password!')">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" alt="G">
+                Sign In with Google
+            </button>
+        </div>
+
+        <div id="status" class="status-msg"></div>
+
+        <div class="auth-footer" style="text-align:center;">
+          Don't have an account? <a href="signup.html" class="auth-link" style="color: var(--primary);">Sign Up</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    const firebaseConfig = { apiKey: "AIzaSyD0AHeTUbLESSjm92F8q05Q_umydANhQEc", authDomain: "fist-85a00.firebaseapp.com", projectId: "fist-85a00", storageBucket: "fist-85a00.firebasestorage.app", messagingSenderId: "134450153526", appId: "1:134450153526:web:9be67e0ea015680e72f097", measurementId: "G-P9CMZKDS9Q" };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    onAuthStateChanged(auth, user => { if(user) window.location.href = 'mindfultask_pro.html'; });
+
+    document.getElementById('togglePw').addEventListener('click', function() {
+      const input = document.getElementById('password');
+      if(input.type === 'password') { input.type = 'text'; this.style.opacity = '1'; } 
+      else { input.type = 'password'; this.style.opacity = '0.5'; }
+    });
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const pw = document.getElementById('password').value;
+      const btn = document.getElementById('submitBtn');
+      const status = document.getElementById('status');
+
+      if(!email || !pw) {
+        status.textContent = 'Please fill in all fields.';
+        status.className = 'status-msg status-error'; status.style.display = 'block';
+        return;
+      }
+      btn.textContent = 'Signing in...'; btn.style.opacity = '0.7';
+
+      try {
+        await signInWithEmailAndPassword(auth, email, pw);
+        status.textContent = 'Success! Redirecting...';
+        status.className = 'status-msg status-success'; status.style.display = 'block';
+      } catch (err) {
+        status.textContent = "Invalid email or password.";
+        status.className = 'status-msg status-error'; status.style.display = 'block';
+        btn.textContent = 'Sign In'; btn.style.opacity = '1';
+      }
+    });
+  </script>
+</body>
+</html>

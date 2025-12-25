@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MindfulTask — Wellness & Productivity</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  
+  <style>
+    /* --- ANIMATIONS --- */
+    .hero-wrapper { position: relative; overflow: hidden; padding-bottom: 80px; }
+    
+    .blob {
+      position: absolute; border-radius: 50%; filter: blur(80px); z-index: -1; opacity: 0.6;
+      animation: float 10s infinite ease-in-out alternate;
+    }
+    .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: var(--primary-light); animation-delay: 0s; }
+    .blob-2 { top: 20%; right: -10%; width: 400px; height: 400px; background: var(--accent); animation-delay: 2s; }
+    .blob-3 { bottom: -10%; left: 20%; width: 600px; height: 600px; background: #D8F3DC; animation-delay: 4s; }
+
+    @keyframes float {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(20px, 40px) scale(1.1); }
+    }
+
+    /* --- LAYOUT HELPERS --- */
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+    .site-header { position: sticky; top: 0; z-index: 10; background: rgba(255,255,255,0.6); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(0,0,0,0.06); }
+    .header-inner { display:flex; align-items:center; justify-content:space-between; gap:16px; min-height:64px; }
+    .brand { display:flex; align-items:center; gap:10px; }
+    .logo { font-weight: 800; font-size: 18px; }
+    .nav { display:flex; align-items:center; gap: 16px; }
+    .nav-link { color: var(--text-main); text-decoration:none; font-weight:600; opacity:.8; }
+    .nav-cta { background: var(--primary); color: #fff; border:none; padding:10px 16px; border-radius:12px; font-weight:800; cursor:pointer; }
+
+    /* --- HERO --- */
+    .hero-content {
+      text-align: center; padding-top: 120px; padding-bottom: 60px; max-width: 900px; margin: 0 auto; position: relative; z-index: 2;
+    }
+    .hero-title { font-size: 56px; line-height: 1.1; margin: 0 0 12px; }
+    .hero-subtitle { color: var(--text-muted); font-size: 18px; max-width: 720px; margin: 0 auto 24px; }
+    .hero-badge {
+      display: inline-block; background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.5); padding: 6px 16px; border-radius: 30px;
+      font-size: 13px; font-weight: 700; color: var(--primary); margin-bottom: 24px;
+    }
+
+    /* --- MOCKUP --- */
+    .mockup-container {
+      background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 24px; padding: 20px; margin-top: 40px;
+      box-shadow: 0 20px 50px rgba(45, 106, 79, 0.15);
+      transform: perspective(1000px) rotateX(2deg); transition: transform 0.5s ease;
+    }
+    .mockup-container:hover { transform: perspective(1000px) rotateX(0deg) translateY(-5px); }
+
+    .stats-strip { display: flex; justify-content: center; gap: 40px; margin: 40px 0; opacity: 0.7; font-weight: 600; color: var(--text-muted); flex-wrap: wrap; }
+    .stats-item { display: flex; align-items: center; gap: 8px; }
+
+    /* --- FEATURES --- */
+    .features-container { display:grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .feature-card { background: #fff; border-radius: 16px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.04); }
+
+    /* --- HOW IT WORKS --- */
+    .step-card { text-align: left; position: relative; padding: 30px; background: #fff; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); }
+    .step-number { font-size: 40px; font-weight: 800; color: #E5E7EB; position: absolute; top: 20px; right: 20px; }
+
+    /* --- FOOTER LINKS --- */
+    .footer-link { color: rgba(255,255,255,0.6); text-decoration: none; transition: 0.2s; }
+    .footer-link:hover { color: white; }
+
+    /* --- RESPONSIVE --- */
+    @media (max-width: 1024px) {
+      .hero-title { font-size: 44px; }
+      .features-container { grid-template-columns: repeat(2, 1fr); }
+      .blob-1 { width: 380px; height:380px; }
+      .blob-2 { width: 320px; height:320px; }
+      .blob-3 { width: 460px; height:460px; }
+    }
+
+    @media (max-width: 768px) {
+      .header-inner { flex-wrap: wrap; }
+      .nav { display:none; }
+      .hero-title { font-size: 36px; }
+      .hero-subtitle { font-size: 16px; }
+      .stats-strip { gap: 20px; font-size: 12px; }
+      .features-container { grid-template-columns: 1fr; }
+      .mockup-container { padding: 14px; border-radius: 16px; }
+      .blob { filter: blur(60px); opacity: 0.5; }
+      .blob-1 { top: -20%; left: -30%; width: 280px; height:280px; }
+      .blob-2 { top: 30%; right: -20%; width: 240px; height:240px; }
+      .blob-3 { bottom: -20%; left: 10%; width: 320px; height:320px; }
+    }
+
+    @media (max-width: 420px) {
+      .logo { font-size: 16px; }
+      .nav { gap: 10px; }
+      .nav-cta { padding: 8px 12px; border-radius: 10px; }
+      .hero-title { font-size: 30px; }
+      .hero-content { padding-top: 90px; }
+    }
+  </style>
+</head>
+<body>
+  
+  <div class="hero-wrapper">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+
+    <header class="site-header">
+      <div class="header-inner container">
+        <div class="brand">
+          <svg class="icon" style="color:var(--primary); width:24px;" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2L2 7l10 5 10-5-10-5zm0 9l2.5-1.25L12 8.5l-2.5 1.25L12 11zm0 2.5l-5-2.5-5 2.5L12 22l10-8.5-5-2.5-5 2.5z"/></svg>
+          <div class="logo">MindfulTask</div>
+        </div>
+        <nav class="nav">
+          <a class="nav-link" href="#how-it-works">How it Works</a>
+          <a class="nav-link" href="login.html">Sign in</a>
+          <button class="nav-cta" onclick="location.href='signup.html'">Get Started</button>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="hero-content">
+        <div class="hero-badge">✨ Voted #1 Student Wellness Tool</div>
+        
+        <h1 class="hero-title">Stop Overworking.<br>Start Flowing.</h1>
+        <p class="hero-subtitle">The only to-do list that knows when you're stressed. Use AI to balance your deadlines with your mental health.</p>
+        
+        <div style="display:flex; gap:16px; justify-content:center; flex-wrap: wrap;">
+          <button onclick="location.href='signup.html'" class="auth-btn" style="width:auto; padding:16px 40px; margin:0; font-size:18px;">Start for Free</button>
+          <button onclick="location.href='mindfultask_pro.html'" style="background:rgba(255,255,255,0.5); backdrop-filter:blur(4px); color:var(--text-main); border:1px solid rgba(0,0,0,0.1); padding:16px 40px; border-radius:18px; font-weight:700; cursor:pointer; font-size:18px;">View Demo</button>
+        </div>
+
+        <div class="stats-strip">
+          <div class="stats-item"><span>🌿</span> 5,000+ Tasks Completed</div>
+          <div class="stats-item"><span>🎓</span> Used by Rungta Students</div>
+          <div class="stats-item"><span>⚡</span> 98% Stress Reduction</div>
+        </div>
+
+        <div class="mockup-container">
+          <div style="background:#fff; border-radius:16px; padding:20px; box-shadow:0 4px 20px rgba(0,0,0,0.05); text-align:left;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:20px; border-bottom:1px solid #eee; padding-bottom:10px;">
+              <div style="font-weight:700; color:var(--primary);">My Dashboard</div>
+              <div style="color:var(--accent);">Mood: 8/10</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px; padding:12px; background:#F9FAFB; border-radius:12px; margin-bottom:8px;">
+              <div style="width:18px; height:18px; border:2px solid #ddd; border-radius:4px;"></div>
+              <div style="height:8px; width:60%; background:#E5E7EB; border-radius:4px;"></div>
+              <div style="margin-left:auto; background:#D8F3DC; color:#2D6A4F; font-size:10px; padding:4px 8px; border-radius:6px; font-weight:700;">LOW STRESS</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <section id="features" class="container" style="padding: 80px 24px;">
+    <div style="text-align:center; max-width:600px; margin:0 auto 60px;">
+      <h2 style="font-size:32px; margin-bottom:16px;">Why MindfulTask?</h2>
+      <p style="color:var(--text-muted);">Standard to-do lists don't care if you're burnt out. We do.</p>
+    </div>
+
+    <div class="features-container">
+      <div class="feature-card">
+        <div class="feature-icon-box" style="background:#D8F3DC; color:var(--primary); width:50px; height:50px; display:flex; align-items:center; justify-content:center; border-radius:12px; margin-bottom:16px;">⚡</div>
+        <h3>Smart Prioritization</h3>
+        <p style="color:#6B7280; margin-top:8px;">We rank tasks by energy impact so you always pick the right next thing.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon-box" style="background:#FFE5D9; color:var(--accent); width:50px; height:50px; display:flex; align-items:center; justify-content:center; border-radius:12px; margin-bottom:16px;">🤖</div>
+        <h3>AI Wellness Coach</h3>
+        <p style="color:#6B7280; margin-top:8px;">A friendly chatbot that monitors your mood and reschedules tasks if you're stressed.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon-box" style="background:#E0E7FF; color:#4338CA; width:50px; height:50px; display:flex; align-items:center; justify-content:center; border-radius:12px; margin-bottom:16px;">⏳</div>
+        <h3>Focus Flow</h3>
+        <p style="color:#6B7280; margin-top:8px;">Built-in timers that remind you to take breaks before fatigue sets in.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="how-it-works" style="background:#fff; padding: 80px 0;">
+    <div class="container">
+      <div style="text-align:center; margin-bottom:60px;">
+        <h2 style="font-size:32px;">How it works</h2>
+      </div>
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:30px;">
+        <div class="step-card">
+          <div class="step-number">01</div>
+          <h3 style="font-size:20px; margin-bottom:10px;">Check In</h3>
+          <p style="color:var(--text-muted);">Start your day by telling our AI how you feel (Energy, Mood, Focus).</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">02</div>
+          <h3 style="font-size:20px; margin-bottom:10px;">Get Your Plan</h3>
+          <p style="color:var(--text-muted);">We generate a task list tailored to your current mental state.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">03</div>
+          <h3 style="font-size:20px; margin-bottom:10px;">Stay Balanced</h3>
+          <p style="color:var(--text-muted);">As you work, we track your vitality and suggest breaks automatically.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:var(--primary); padding: 80px 24px; text-align:center; color:white;">
+    <h2 style="font-size:36px; margin-bottom:20px;">Ready to reclaim your focus?</h2>
+    <p style="opacity:0.8; max-width:600px; margin:0 auto 40px; font-size:18px;">Join your fellow students in building a healthier relationship with work.</p>
+    <button onclick="location.href='signup.html'" style="background:white; color:var(--primary); border:none; padding:16px 48px; border-radius:99px; font-weight:800; font-size:18px; cursor:pointer; box-shadow:0 10px 20px rgba(0,0,0,0.2); transition:transform 0.2s;">Create Free Account</button>
+  </section>
+
+  <footer style="background:#1B4332; color:rgba(255,255,255,0.6); padding:40px 24px; font-size:14px;">
+    <div class="container" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:20px;">
+      <div>
+        <div style="color:white; font-weight:700; font-size:18px; margin-bottom:8px;">MindfulTask</div>
+        Build for Hackathon 2025.
+      </div>
+      <div style="display:flex; gap:20px;">
+        <a href="#" class="footer-link">Privacy</a>
+        <a href="#" class="footer-link">Terms</a>
+        <a href="#" class="footer-link">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

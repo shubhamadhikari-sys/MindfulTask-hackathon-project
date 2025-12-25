@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MindfulTask Pro — Settings</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary: #047857;
+      --bg-body: #F3F4F6;
+      --surface: #FFFFFF;
+      --text-main: #111827;
+      --border: #E5E7EB;
+      --sidebar-width: 260px;
+    }
+    * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+    body { margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-body); color: var(--text-main); height: 100vh; overflow: hidden; }
+
+    .app-layout { display: grid; grid-template-columns: var(--sidebar-width) 1fr; height: 100vh; max-width: 1920px; margin: 0 auto; transition: all 0.3s ease; }
+
+    /* SIDEBAR */
+    .sidebar { background: var(--surface); border-right: 1px solid var(--border); padding: 30px; display: flex; flex-direction: column; z-index: 50; transition: transform 0.3s ease; }
+    .logo { font-size: 22px; font-weight: 800; color: var(--primary); margin-bottom: 40px; display: flex; align-items: center; gap: 8px; }
+    .nav-item { padding: 12px 16px; margin-bottom: 8px; color: #64748b; font-weight: 600; font-size: 14px; border-radius: 12px; text-decoration: none; display: block; }
+    .nav-item:hover { background: #F9FAFB; color: var(--text-main); }
+    .nav-item.active { background: #ECFDF5; color: var(--primary); }
+
+    .main-content { padding: 40px; overflow-y: auto; max-width: 800px; height: 100vh; }
+    
+    .settings-section { background: white; border-radius: 20px; padding: 30px; margin-bottom: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); border: 1px solid var(--border); }
+    h2 { margin-top: 0; font-size: 18px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+    
+    .form-group { margin-bottom: 20px; }
+    label { display: block; font-size: 13px; font-weight: 600; color: #64748b; margin-bottom: 8px; }
+    input[type="text"] { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px; font-family: inherit; }
+    
+    .btn-save { background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 10px; font-weight: 700; cursor: pointer; width: 100%; }
+    .btn-danger { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; padding: 12px 24px; border-radius: 10px; font-weight: 700; cursor: pointer; width: 100%; text-align: left; }
+
+    /* MOBILE */
+    .mobile-header { display: none; justify-content: space-between; align-items: center; padding: 15px 20px; background: var(--surface); border-bottom: 1px solid var(--border); position: fixed; top: 0; left: 0; right: 0; z-index: 40; }
+    .menu-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-main); }
+    .overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 45; display: none; backdrop-filter: blur(4px); }
+    .overlay.active { display: block; }
+
+    @media (max-width: 900px) {
+        body { overflow: auto; }
+        .app-layout { display: block; padding-top: 60px; height: auto; }
+        .mobile-header { display: flex; }
+        .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: 260px; transform: translateX(-100%); box-shadow: 20px 0 50px rgba(0,0,0,0.1); }
+        .sidebar.open { transform: translateX(0); }
+        .main-content { padding: 20px; height: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="mobile-header">
+    <div style="font-weight: 800; color: var(--primary); font-size: 18px;">🍃 MindfulTask</div>
+    <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+  </div>
+  <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="logo">🍃 MindfulTask</div>
+      <a href="mindfultask_pro.html" class="nav-item">📊 Dashboard</a>
+      <a href="calendar.html" class="nav-item">📅 Schedule</a>
+      <a href="tasks.html" class="nav-item">✅ My Tasks</a>
+      <a href="#" class="nav-item active">⚙️ Settings</a>
+    </aside>
+
+    <main class="main-content">
+      <h1>Settings</h1>
+      <div class="settings-section">
+        <h2>👤 Profile</h2>
+        <div class="form-group">
+          <label>Display Name</label>
+          <input type="text" id="userNameInput" placeholder="Enter your name">
+        </div>
+        <button class="btn-save" onclick="saveProfile()">Save Changes</button>
+      </div>
+      <div class="settings-section" style="border-color: #fca5a5;">
+        <h2 style="color: #991b1b; border-color: #fca5a5;">⚠️ Danger Zone</h2>
+        <p style="font-size: 13px; color: #64748b; margin-bottom: 20px;">
+          This will permanently delete all your tasks and data.
+        </p>
+        <button class="btn-danger" onclick="resetApp()">🗑️ Reset Everything</button>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('open');
+      document.getElementById('overlay').classList.toggle('active');
+    }
+    function init() {
+      const savedName = localStorage.getItem('mt_username');
+      if (savedName) document.getElementById('userNameInput').value = savedName;
+    }
+    function saveProfile() {
+      const name = document.getElementById('userNameInput').value.trim();
+      if (name) { localStorage.setItem('mt_username', name); alert('Saved!'); }
+    }
+    function resetApp() {
+      if(confirm('Are you sure? This will wipe all data.')) {
+        localStorage.clear();
+        window.location.href = 'mindfultask_pro.html';
+      }
+    }
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

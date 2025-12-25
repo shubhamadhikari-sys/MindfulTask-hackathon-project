@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MindfulTask Pro — Command Center</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #047857;      
+      --primary-dark: #064e3b;
+      --primary-light: #ECFDF5;
+      --accent: #10b981;       
+      --bg-body: #F3F4F6;
+      --surface: #FFFFFF;
+      --text-main: #111827;
+      --text-muted: #6B7280;
+      --border: #E5E7EB;
+      --radius: 20px;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      --sidebar-width: 250px;
+    }
+    * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+    
+    /* FORCE 100% HEIGHT FOR DESKTOP DASHBOARD */
+    html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-body); color: var(--text-main); }
+    
+    /* APP LAYOUT */
+    .app-layout { display: grid; grid-template-columns: var(--sidebar-width) 1fr 380px; height: 100%; width: 100%; }
+    
+    /* SIDEBAR */
+    .sidebar { background: var(--surface); border-right: 1px solid var(--border); padding: 24px; display: flex; flex-direction: column; justify-content: space-between; z-index: 50; }
+    .logo { font-size: 20px; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 8px; margin-bottom: 30px; }
+    .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; margin-bottom: 4px; color: var(--text-muted); font-weight: 600; font-size: 14px; border-radius: 10px; text-decoration: none; transition: 0.2s; }
+    .nav-item.active { background: var(--primary-light); color: var(--primary); }
+    .nav-item:hover { background: #F9FAFB; color: var(--text-main); }
+    
+    /* MAIN CONTENT AREA */
+    .main-content { 
+      padding: 24px; 
+      display: grid; 
+      /* Two columns equal width */
+      grid-template-columns: 1fr 1fr; 
+      /* Rows: Banner (auto), Middle Cards (auto), Bottom Cards (fills rest) */
+      grid-template-rows: auto auto 1fr; 
+      gap: 20px; 
+      height: 100%; 
+      overflow-y: auto; 
+    }
+    
+    .mobile-header { display: none; justify-content: space-between; align-items: center; padding: 15px 20px; background: var(--surface); border-bottom: 1px solid var(--border); position: fixed; top: 0; left: 0; right: 0; z-index: 40; }
+    .menu-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-main); }
+    
+    /* CARDS */
+    .welcome-banner { grid-column: span 2; background: var(--primary-dark); color: white; padding: 30px; border-radius: var(--radius); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 20px rgba(6, 78, 59, 0.2); }
+    
+    .bento-card { 
+      background: var(--surface); 
+      border-radius: var(--radius); 
+      padding: 20px; 
+      border: 1px solid var(--border); 
+      box-shadow: var(--shadow); 
+      display: flex; 
+      flex-direction: column; 
+      overflow: hidden; 
+    }
+    
+    .timer-card { background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: white; border: none; }
+    .timer-display { font-size: 48px; font-weight: 800; margin: 10px 0; letter-spacing: -2px; }
+    .timer-btn { background: rgba(255,255,255,0.2); border: none; color: white; padding: 8px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 13px; }
+    .timer-btn:hover { background: white; color: var(--primary); }
+    
+    /* TASK SECTION */
+    .task-section { 
+      grid-column: span 1; 
+      /* Fill remaining height */
+      height: 100%; 
+      min-height: 250px;
+    }
+    .input-row { display: flex; gap: 8px; margin-bottom: 16px; }
+    .input-field { flex: 1; padding: 10px; border: 1px solid var(--border); border-radius: 10px; font-family: inherit; font-size: 13px; }
+    .btn-add { background: var(--primary); color: white; border: none; padding: 0 16px; border-radius: 10px; font-weight: 700; cursor: pointer; }
+    
+    .task-item { display: flex; align-items: flex-start; gap: 10px; padding: 12px 0; border-bottom: 1px solid #F3F4F6; }
+    .task-text { flex: 1; font-size: 13px; font-weight: 500; line-height: 1.4; word-break: break-word; }
+    
+    .mini-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 10px; }
+    .cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 11px; border-radius: 6px; background: #F9FAFB; color: var(--text-muted); }
+    .cal-day.today { background: var(--primary); color: white; font-weight: 700; }
+    .cal-day.has-task { border: 1px solid var(--accent); color: var(--primary); background: #ECFDF5; }
+    
+    /* VITALITY SECTION (Now in Main Grid) */
+    .vitality-section {
+        grid-column: span 1;
+        height: 100%;
+        min-height: 250px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    .vitality-bar { height: 8px; background: #E5E7EB; border-radius: 10px; margin-top: 8px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 10px; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+
+    /* RIGHT PANEL */
+    .right-panel { 
+      background: var(--surface); 
+      border-left: 1px solid var(--border); 
+      padding: 24px; 
+      display: flex; 
+      flex-direction: column; 
+      gap: 16px; 
+      height: 100%; 
+      overflow: hidden; 
+    }
+    
+    .smart-card {
+        background: #ECFDF5; border-radius: 20px; padding: 16px; border: 1px solid #D1FAE5;
+        flex-shrink: 0; 
+        display: none;
+    }
+
+    .chat-container-wrapper {
+        flex: 1; /* Grow to fill ALL remaining space */
+        display: flex; 
+        flex-direction: column;
+        overflow: hidden;
+        min-height: 0;
+    }
+    .chat-container { 
+        flex: 1; 
+        background: #F9FAFB; 
+        border-radius: 16px; 
+        padding: 12px; 
+        display: flex; 
+        flex-direction: column; 
+        border: 1px solid var(--border); 
+        overflow: hidden;
+    }
+    .chat-feed { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; padding-right: 4px; }
+    .msg { padding: 8px 12px; border-radius: 12px; font-size: 12px; max-width: 90%; line-height: 1.4; }
+    .msg-ai { background: white; border: 1px solid var(--border); color: var(--text-main); align-self: flex-start; border-bottom-left-radius: 4px; }
+    .msg-user { background: var(--primary); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+    
+    .overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 45; display: none; backdrop-filter: blur(4px); }
+    .overlay.active { display: block; }
+    
+    @media (max-width: 1200px) { .app-layout { grid-template-columns: 80px 1fr 320px; } .sidebar { padding: 20px 10px; } .logo span, .nav-item span, .sidebar button span { display: none; } .logo { justify-content: center; margin-bottom: 20px; } .nav-item { justify-content: center; padding: 15px; } }
+    
+    @media (max-width: 900px) { 
+        /* FIXED HERE: MUST RESET HTML OVERFLOW AS WELL */
+        html, body { overflow: auto; height: auto; }
+        
+        .app-layout { display: block; height: auto; padding-top: 60px; } 
+        .mobile-header { display: flex; } 
+        .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: 260px; transform: translateX(-100%); padding: 30px; box-shadow: 20px 0 50px rgba(0,0,0,0.1); } 
+        .sidebar.open { transform: translateX(0); } 
+        .main-content { display: flex; flex-direction: column; height: auto; padding: 20px; overflow: visible; } 
+        .right-panel { border-left: none; border-top: 1px solid var(--border); height: auto; padding: 20px; overflow: visible; } 
+    }
+  </style>
+</head>
+<body>
+  <div class="mobile-header">
+      <div style="font-weight: 800; color: var(--primary); font-size: 18px;">🍃 MindfulTask</div>
+      <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+  </div>
+  <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+      <div>
+        <div class="logo">🍃 <span>MindfulTask</span></div>
+        <a href="#" class="nav-item active">📊 <span>Dashboard</span></a>
+        <a href="calendar.html" class="nav-item">📅 <span>Schedule</span></a>
+        <a href="tasks.html" class="nav-item">✅ <span>My Tasks</span></a>
+        <a href="settings.html" class="nav-item">⚙️ <span>Settings</span></a>
+      </div>
+      <button id="signOutBtn" class="nav-item" style="color: #ef4444; border:none; background:none; cursor:pointer;">
+        🚪 <span>Sign Out</span>
+      </button>
+    </aside>
+    
+    <main class="main-content">
+      <div class="welcome-banner">
+        <div>
+          <h1 style="margin:0; font-size:22px;" id="greeting">Welcome Back!</h1>
+          <p style="margin:4px 0 0 0; opacity:0.8; font-size:14px;">Your ecosystem is synced and online.</p>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:28px; font-weight:700;" id="currentDateDay">25</div>
+          <div style="font-size:13px; opacity:0.8;" id="currentDateMonth">December</div>
+        </div>
+      </div>
+      
+      <div class="bento-card timer-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+            <h3 style="margin:0; opacity:0.9; font-size:13px; text-transform:uppercase; letter-spacing:1px;">Focus Zone</h3>
+            <span style="font-size:11px; background:rgba(255,255,255,0.2); padding:2px 8px; border-radius:10px;">Pomodoro</span>
+        </div>
+        <div id="timerDisplay" class="timer-display">25:00</div>
+        <div style="display:flex; gap:8px;">
+          <button class="timer-btn" onclick="startTimer()">▶ Start</button>
+          <button class="timer-btn" onclick="resetTimer()">↺ Reset</button>
+        </div>
+      </div>
+      
+      <div class="bento-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <h3 style="margin:0; font-size:15px;">This Month</h3>
+          <a href="calendar.html" style="font-size:11px; color:var(--primary); text-decoration:none; font-weight:700;">EXPAND ↗</a>
+        </div>
+        <div class="mini-cal-grid" id="miniCalendarGrid"></div>
+      </div>
+      
+      <div class="bento-card task-section">
+        <h3 style="margin:0 0 12px 0; font-size:16px;">Priority Tasks</h3>
+        <div class="input-row">
+          <input type="text" id="taskInput" class="input-field" placeholder="Add task..." onkeypress="handleEnter(event)">
+          <button class="btn-add" onclick="addTask()">+</button>
+        </div>
+        <div id="taskList" style="overflow-y:auto; flex:1; padding-right:5px;"></div>
+      </div>
+
+      <div class="bento-card vitality-section">
+        <h3 style="margin:0 0 16px 0; display:flex; align-items:center; gap:8px; font-size:16px;">🌿 Vitality Score</h3>
+        
+        <div style="margin-bottom:16px;">
+          <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:600; margin-bottom:4px;">
+            <span>Mood</span> <span id="moodValue" style="color:var(--text-muted);">5/10</span>
+          </div>
+          <div class="vitality-bar"><div id="moodBar" class="bar-fill" style="width:50%; background:#F59E0B;"></div></div>
+        </div>
+
+        <div style="margin-bottom:16px;">
+          <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:600; margin-bottom:4px;">
+            <span>Energy</span> <span id="energyValue" style="color:var(--text-muted);">5/10</span>
+          </div>
+          <div class="vitality-bar"><div id="energyBar" class="bar-fill" style="width:50%; background:#10B981;"></div></div>
+        </div>
+
+        <div>
+          <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:600; margin-bottom:4px;">
+            <span>Focus</span> <span id="focusValue" style="color:var(--text-muted);">5/10</span>
+          </div>
+          <div class="vitality-bar"><div id="focusBar" class="bar-fill" style="width:50%; background:#3B82F6;"></div></div>
+        </div>
+      </div>
+
+    </main>
+    
+    <aside class="right-panel">
+      <div id="smartRecsCard" class="smart-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <h3 style="margin: 0; font-size: 14px; color: var(--primary-dark); display:flex; align-items:center; gap:6px;">✨ Smart Insights</h3>
+          <span id="wellnessScoreDisplay" style="font-size: 11px; font-weight: 800; background: white; padding: 3px 8px; border-radius: 8px; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05);">Score: --</span>
+        </div>
+        <div id="aiRecommendationsList" style="display: flex; flex-direction: column; gap: 8px;"></div>
+        <button onclick="openWellnessCheck()" style="width: 100%; margin-top: 12px; background: white; border: 1px solid var(--primary); color: var(--primary); padding: 8px; border-radius: 10px; font-size: 11px; font-weight: 700; cursor: pointer;">⚡ Update Status</button>
+      </div>
+
+      <div class="chat-container-wrapper">
+        <h3 style="margin:0 0 10px 0; font-size:14px;">✨ AI Coach</h3>
+        <div class="chat-container">
+          <div id="chatMessages" class="chat-feed"></div>
+          <div style="display:flex; gap:6px;">
+            <input type="text" id="chatInput" class="input-field" style="padding:8px;" placeholder="Ask AI..." onkeypress="handleChatEnter(event)">
+            <button onclick="sendMessage()" style="background:var(--primary); color:white; border:none; border-radius:10px; width:36px; cursor:pointer;">➤</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <div id="wellnessModal" class="overlay" style="z-index: 100;">
+    <div style="background: white; width: 100%; max-width: 450px; margin: 40px auto; border-radius: 20px; padding: 24px; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.2);">
+      <div style="text-align: center; margin-bottom: 20px;">
+        <h2 style="font-size: 18px; color: var(--primary);">Daily Health Assessment</h2>
+        <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Help AI understand how you're feeling.</p>
+      </div>
+      <div style="height: 4px; background: #F3F4F6; border-radius: 10px; margin-bottom: 24px; overflow: hidden;">
+        <div id="quizProgress" style="height: 100%; width: 10%; background: var(--primary); transition: width 0.3s ease;"></div>
+      </div>
+      <div id="questionContainer" style="min-height: 180px;"></div>
+      <div style="display: flex; justify-content: space-between; margin-top: 24px;">
+        <button id="prevBtn" onclick="prevQuestion()" style="background: none; border: none; color: var(--text-muted); font-weight: 600; cursor: pointer; display: none; font-size:13px;">Back</button>
+        <button id="nextBtn" onclick="nextQuestion()" style="background: var(--primary); color: white; border: none; padding: 10px 24px; border-radius: 10px; font-weight: 700; cursor: pointer; margin-left: auto; font-size:13px;">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
+
+    const firebaseConfig = { apiKey: "AIzaSyD0AHeTUbLESSjm92F8q05Q_umydANhQEc", authDomain: "fist-85a00.firebaseapp.com", projectId: "fist-85a00", storageBucket: "fist-85a00.firebasestorage.app", messagingSenderId: "1.34450153526e+11", appId: "1:1.34450153526e+11:web:9be67e0ea015680e72f097", measurementId: "G-P9CMZKDS9Q" };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    onAuthStateChanged(auth, user => { 
+      if (!user) location.replace('login.html'); 
+      else {
+        let name = user.displayName;
+        if (!name && user.email) {
+            name = user.email.split('@')[0]; 
+            name = name.charAt(0).toUpperCase() + name.slice(1);
+        }
+        const greetingEl = document.getElementById('greeting');
+        if (greetingEl) greetingEl.innerText = `Welcome Back, ${name || 'User'}!`;
+        localStorage.setItem('mt_username', name || 'User');
+      }
+    });
+    document.getElementById('signOutBtn').addEventListener('click', () => signOut(auth).then(() => location.replace('login.html')));
+
+    const API_KEY = "AIzaSyAgVbEg0J3EcKd372LZT8pwBW-xurZ-oLg"; 
+    const genAI = new GoogleGenerativeAI(API_KEY);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    window.sendMessage = async function() {
+        const input = document.getElementById('chatInput');
+        const txt = input.value.trim();
+        if (!txt) return;
+        addMsg('user', txt);
+        input.value = '';
+        const chatFeed = document.getElementById('chatMessages');
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'msg msg-ai';
+        loadingDiv.innerHTML = '<em>Thinking...</em>';
+        chatFeed.appendChild(loadingDiv);
+        chatFeed.scrollTop = chatFeed.scrollHeight;
+        try {
+            const result = await model.generateContent(txt);
+            const response = await result.response;
+            loadingDiv.innerHTML = response.text();
+        } catch (e) {
+            loadingDiv.innerHTML = "⚠️ Coach is offline.";
+        }
+    };
+  </script>
+
+  <script>
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').classList.toggle('active'); }
+    let tasks = [];
+    let wellness = { mood: 5, energy: 5, focus: 5 };
+    let timer = null; let timeLeft = 25 * 60;
+    
+    function init() {
+      try { tasks = JSON.parse(localStorage.getItem('mt_tasks') || '[]'); } catch(e) {}
+      try { wellness = JSON.parse(localStorage.getItem('mt_wellness') || '{"mood":5,"energy":5,"focus":5}'); } catch(e) {}
+      const today = new Date();
+      document.getElementById('currentDateDay').innerText = today.getDate();
+      document.getElementById('currentDateMonth').innerText = today.toLocaleString('default', { month: 'long', year: 'numeric' });
+      renderTasks(); renderMiniCalendar(); updateStats();
+      if(sessionStorage.getItem('ai_greeted') !== 'true') { setTimeout(startDemoChat, 1500); sessionStorage.setItem('ai_greeted', 'true'); }
+    }
+    function addTask() {
+      const txt = document.getElementById('taskInput').value.trim();
+      if(!txt) return;
+      tasks.push({ id: Date.now(), text: txt, completed: false, date: new Date().toISOString() });
+      document.getElementById('taskInput').value = '';
+      saveData(); renderTasks(); renderMiniCalendar(); 
+    }
+    function renderTasks() {
+      const list = document.getElementById('taskList');
+      if(tasks.length === 0) { list.innerHTML = `<div style="text-align:center; color:#9ca3af; margin-top:40px; font-size:13px;">🍃 No pending tasks.</div>`; return; }
+      list.innerHTML = tasks.map(t => `<div class="task-item"><input type="checkbox" ${t.completed?'checked':''} onchange="toggleTask(${t.id})" style="accent-color:var(--primary); cursor:pointer;"><span class="task-text" style="text-decoration:${t.completed?'line-through':'none'}; color:${t.completed?'#9ca3af':'inherit'}">${t.text}</span><button onclick="delTask(${t.id})" style="border:none; background:none; color:#ef4444; cursor:pointer;">&times;</button></div>`).join('');
+    }
+    function toggleTask(id) { const t = tasks.find(x=>x.id===id); if(t) t.completed=!t.completed; saveData(); renderTasks(); }
+    function delTask(id) { tasks = tasks.filter(x=>x.id!==id); saveData(); renderTasks(); renderMiniCalendar(); }
+    function saveData() { localStorage.setItem('mt_tasks', JSON.stringify(tasks)); localStorage.setItem('mt_wellness', JSON.stringify(wellness)); }
+    function renderMiniCalendar() {
+      const g = document.getElementById('miniCalendarGrid'); g.innerHTML = '';
+      const today = new Date().getDate();
+      for(let i=1; i<=30; i++) {
+        let hasTask = (i === today && tasks.length > 0);
+        let classes = 'cal-day' + (i === today ? ' today' : '') + (hasTask ? ' has-task' : '');
+        g.innerHTML += `<div class="${classes}">${i}</div>`;
+      }
+    }
+    function startTimer() { if(timer) return; document.getElementById('timerDisplay').style.color = "#a7f3d0"; timer = setInterval(() => { if(timeLeft > 0) { timeLeft--; updateTimerUI(); } else { clearInterval(timer); alert("Focus Session Complete!"); wellness.focus = Math.min(10, wellness.focus + 2); updateStats(); resetTimer(); } }, 1000); }
+    function resetTimer() { clearInterval(timer); timer = null; timeLeft = 25*60; document.getElementById('timerDisplay').style.color = "white"; updateTimerUI(); }
+    function updateTimerUI() { const m = Math.floor(timeLeft/60).toString().padStart(2,'0'); const s = (timeLeft%60).toString().padStart(2,'0'); document.getElementById('timerDisplay').innerText = `${m}:${s}`; }
+    function startDemoChat() { const count = tasks.filter(t => !t.completed).length; addMsg('ai', count === 0 ? "Schedule clear. Energy level?" : `I see ${count} tasks. Ready?`); }
+    function addMsg(role, txt) { const d = document.createElement('div'); d.className = `msg msg-${role}`; d.innerText = txt; const f = document.getElementById('chatMessages'); f.appendChild(d); f.scrollTop = f.scrollHeight; }
+    
+    function updateStats() {
+      // Updates bars - Elements are now in the Main Grid but IDs are same
+      document.getElementById('moodBar').style.width = wellness.mood*10 + '%'; document.getElementById('moodValue').innerText = wellness.mood+"/10";
+      document.getElementById('energyBar').style.width = wellness.energy*10 + '%'; document.getElementById('energyValue').innerText = wellness.energy+"/10";
+      document.getElementById('focusBar').style.width = wellness.focus*10 + '%'; document.getElementById('focusValue').innerText = wellness.focus+"/10";
+    }
+
+    function handleEnter(e) { if(e.key==='Enter') addTask(); }
+    function handleChatEnter(e) { if(e.key==='Enter') window.sendMessage(); }
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+
+  <script>
+    const questions = [
+      { id: 'sleep', text: "How well did you sleep last night?", type: 'radio', options: [ { label: 'Very Poorly (< 5hrs)', value: 'poor' }, { label: 'Fair (5-7hrs)', value: 'fair' }, { label: 'Well (7-8hrs)', value: 'good' }, { label: 'Excellent (8+ hrs)', value: 'excellent' } ] },
+      { id: 'symptoms', text: "Are you experiencing any physical discomfort?", type: 'multiselect', options: [ { label: 'None / Healthy', value: 'none' }, { label: '🤕 Headache / Migraine', value: 'headache' }, { label: '🤒 Cold / Flu Symptoms', value: 'cold' }, { label: '⚡ Fatigue / Body Ache', value: 'fatigue' }, { label: '🥴 Stomach Issues', value: 'stomach' }, { label: '😶‍🌫️ Brain Fog', value: 'brainfog' } ] },
+      { id: 'mood', text: "How are you feeling emotionally?", type: 'slider', min: 1, max: 10, labels: ['Very Low', 'Neutral', 'Excellent'] },
+      { id: 'focus', text: "How sharp is your mental focus right now?", type: 'slider', min: 1, max: 10, labels: ['Distracted', 'Okay', 'Laser Focused'] },
+      { id: 'social', text: "Have you connected with friends or family today?", type: 'radio', options: [ { label: 'No contact yet', value: 'isolated' }, { label: 'Brief text/message', value: 'low' }, { label: 'Meaningful conversation', value: 'high' } ] }
+    ];
+    let currentStep = 0; let answers = {};
+    function openWellnessCheck() { document.getElementById('wellnessModal').style.display = 'block'; currentStep = 0; answers = {}; renderQuestion(); }
+    function renderQuestion() {
+      const q = questions[currentStep];
+      const container = document.getElementById('questionContainer');
+      document.getElementById('quizProgress').style.width = ((currentStep + 1) / questions.length) * 100 + '%';
+      document.getElementById('prevBtn').style.display = currentStep === 0 ? 'none' : 'block';
+      document.getElementById('nextBtn').innerText = currentStep === questions.length - 1 ? 'Finish' : 'Next';
+      let html = `<h3 style="margin-bottom:16px; font-size:16px;">${q.text}</h3>`;
+      if(q.type === 'radio') { html += `<div style="display:flex; flex-direction:column; gap:8px;">`; q.options.forEach(opt => { const isSelected = answers[q.id] === opt.value ? 'border: 2px solid var(--primary); background: #ECFDF5;' : 'border: 1px solid #eee;'; html += `<div onclick="selectOption('${q.id}', '${opt.value}')" style="padding:12px; border-radius:10px; cursor:pointer; transition:0.2s; ${isSelected}"><div style="font-weight:600; font-size:13px;">${opt.label}</div></div>`; }); html += `</div>`; } 
+      else if(q.type === 'multiselect') { const currentVals = answers[q.id] || []; html += `<div style="display:flex; flex-wrap:wrap; gap:8px;">`; q.options.forEach(opt => { const active = currentVals.includes(opt.value) ? 'background:var(--primary); color:white;' : 'background:#F3F4F6; color:#374151;'; html += `<div onclick="toggleMulti('${q.id}', '${opt.value}')" style="padding:8px 14px; border-radius:16px; font-size:13px; font-weight:600; cursor:pointer; transition:0.2s; ${active}">${opt.label}</div>`; }); html += `</div>`; } 
+      else if(q.type === 'slider') { const val = answers[q.id] || 5; html += `<div style="padding: 16px 0;"><input type="range" min="${q.min}" max="${q.max}" value="${val}" oninput="answers['${q.id}'] = this.value; document.getElementById('sliderVal').innerText = this.value" style="width:100%; accent-color: var(--primary); height: 6px; border-radius: 5px; background: #d3d3d3; outline: none;"><div style="text-align:center; font-size:20px; font-weight:800; color:var(--primary); margin-top:8px;" id="sliderVal">${val}</div><div style="display:flex; justify-content:space-between; font-size:11px; color:#9ca3af; margin-top:4px;"><span>${q.labels[0]}</span><span>${q.labels[1]}</span><span>${q.labels[2]}</span></div></div>`; if(!answers[q.id]) answers[q.id] = 5; }
+      container.innerHTML = html;
+    }
+    window.selectOption = (id, val) => { answers[id] = val; renderQuestion(); };
+    window.toggleMulti = (id, val) => { if(!answers[id]) answers[id] = []; if(val === 'none') { answers[id] = ['none']; } else { answers[id] = answers[id].filter(x => x !== 'none'); if(answers[id].includes(val)) answers[id] = answers[id].filter(x => x !== val); else answers[id].push(val); } renderQuestion(); };
+    window.prevQuestion = () => { currentStep--; renderQuestion(); };
+    window.nextQuestion = () => { if(currentStep < questions.length - 1) { currentStep++; renderQuestion(); } else { finishAssessment(); } };
+    function finishAssessment() {
+      document.getElementById('wellnessModal').style.display = 'none';
+      let moodScore = answers.mood ? parseInt(answers.mood) : 5; let energyScore = 5; let focusScore = answers.focus ? parseInt(answers.focus) : 5;
+      if(answers.social === 'high') moodScore += 1; if(answers.social === 'isolated') moodScore -= 1;
+      if(answers.sleep === 'poor') energyScore = 3; else if(answers.sleep === 'fair') energyScore = 6; else if(answers.sleep === 'good') energyScore = 8; else if(answers.sleep === 'excellent') energyScore = 10;
+      const sym = answers.symptoms || []; if(sym.includes('fatigue') || sym.includes('cold')) energyScore -= 3; if(sym.includes('headache') || sym.includes('brainfog')) focusScore -= 2;
+      moodScore = Math.max(1, Math.min(10, moodScore)); energyScore = Math.max(1, Math.min(10, energyScore)); focusScore = Math.max(1, Math.min(10, focusScore));
+      wellness = { mood: moodScore, energy: energyScore, focus: focusScore }; saveData(); updateStats();
+      let recs = [];
+      if(sym.includes('headache')) recs.push({ icon: '🧠', text: "<strong>Headache:</strong> Dim screens, drink water, take a 10m break." });
+      if(sym.includes('brainfog')) recs.push({ icon: '🌫️', text: "<strong>Brain Fog:</strong> Try a 5-minute deep breathing session." });
+      if(energyScore <= 4) recs.push({ icon: '🔋', text: "<strong>Low Energy:</strong> Reschedule non-urgent tasks." });
+      if(focusScore <= 4) recs.push({ icon: '🍅', text: "<strong>Distracted:</strong> Use the Timer (Pomodoro) for just 15 mins." });
+      if(answers.social === 'isolated' && moodScore <= 5) recs.push({ icon: '💬', text: "<strong>Isolation:</strong> Text a friend. Connection boosts mood." });
+      if(moodScore >= 8 && energyScore >= 8) recs.push({ icon: '🚀', text: "<strong>Peak State:</strong> Perfect time for deep work!" });
+      if(recs.length === 0) recs.push({ icon: '✨', text: "You are balanced! Keep up the flow." });
+      const list = document.getElementById('aiRecommendationsList');
+      list.innerHTML = recs.map(r => `<div style="display:flex; gap:10px; align-items:start; font-size:12px; color:#374151; background:white; padding:10px; border-radius:10px; border:1px solid #F3F4F6;"><span style="font-size:16px;">${r.icon}</span><div style="line-height:1.4;">${r.text}</div></div>`).join('');
+      const avgScore = Math.round((moodScore + energyScore + focusScore) / 3 * 10);
+      document.getElementById('wellnessScoreDisplay').innerText = `Score: ${avgScore}`;
+      document.getElementById('smartRecsCard').style.display = 'block';
+      localStorage.setItem('mt_smart_wellness', JSON.stringify({ date: Date.now(), score: avgScore, recs, answers }));
+    }
+    window.addEventListener('load', () => {
+       const saved = JSON.parse(localStorage.getItem('mt_smart_wellness'));
+       if(!saved) { setTimeout(openWellnessCheck, 1000); } 
+       else {
+         document.getElementById('smartRecsCard').style.display = 'block';
+         document.getElementById('wellnessScoreDisplay').innerText = `Score: ${saved.score}`;
+         document.getElementById('aiRecommendationsList').innerHTML = saved.recs.map(r => `<div style="display:flex; gap:10px; align-items:start; font-size:12px; color:#374151; background:white; padding:10px; border-radius:10px; border:1px solid #F3F4F6;"><span style="font-size:16px;">${r.icon}</span><div style="line-height:1.4;">${r.text}</div></div>`).join('');
+       }
+    });
+  </script>
+</body>
+</html>
